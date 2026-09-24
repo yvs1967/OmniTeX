@@ -195,10 +195,10 @@ git push origin main
 
 ## Contributors & Credits
 
-- **Designed and Built by**: Venkata Subbaiah (Using AI Studio)
+- **Designed and Built by**: [Venkata Subbaiah](https://yvs1967.github.io) (Using AI Studio)
 
 ---
 
 ## License
 
-Apache-2.0
+MIT
