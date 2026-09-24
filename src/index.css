@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* 
+ * PDF Text Selection Font Fix:
+ * In react-pdf / PDF.js, an invisible textLayer of DOM spans sits over the PDF canvas (which renders
+ * the true embedded LaTeX fonts). When users select text, browsers apply default ::selection styling
+ * (setting text color to white/black), which reveals the DOM text in the browser's generic fallback font
+ * (Arial/sans-serif) over the LaTeX font, making the font appear to change or glitch.
+ *
+ * Enforcing color: transparent and -webkit-text-fill-color: transparent on ::selection keeps the 
+ * text layer completely invisible, showing only the crisp selection highlight over the original LaTeX font.
+ */
+.textLayer,
+.react-pdf__Page__textContent {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.textLayer :is(span, br),
+.react-pdf__Page__textContent :is(span, br) {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  pointer-events: auto !important;
+  cursor: text !important;
+}
+
+.textLayer ::selection,
+.textLayer :is(span, br)::selection,
+.react-pdf__Page__textContent ::selection,
+.react-pdf__Page__textContent :is(span, br)::selection {
+  background: rgba(59, 130, 246, 0.35) !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.textLayer ::-moz-selection,
+.textLayer :is(span, br)::-moz-selection,
+.react-pdf__Page__textContent ::-moz-selection,
+.react-pdf__Page__textContent :is(span, br)::-moz-selection {
+  background: rgba(59, 130, 246, 0.35) !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}

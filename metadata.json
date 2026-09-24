@@ -1,0 +1,8 @@
+{
+  "name": "OmniTex",
+  "description": "OmniTex - A Git-backed local web IDE for LaTeX with Overleaf-style UI, Monaco editor, and real-time preview.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
