@@ -1,6 +1,6 @@
 # OmniTex
 
-A modern, web-based LaTeX IDE with Overleaf-style UI, Monaco Editor, live PDF compilation, SyncTeX bidirectional reverse search, and built-in GitHub synchronization.
+A modern, web-based LaTeX IDE, Monaco Editor, live PDF compilation, SyncTeX bidirectional reverse search, and built-in GitHub synchronization.
 
 No Electron or desktop installer required—simply clone the repository, install dependencies with Node.js, and run.
 
