@@ -57,7 +57,7 @@ async function compileLatexOnline(fileContent: string, outputPdfPath: string): P
 let miktexConfigured = false;
 
 /**
- * Configure MiKTeX to install packages automatically without asking (Overleaf behavior)
+ * Configure MiKTeX to install packages automatically without interactive prompt.
  */
 async function configureMikTexAutoInstall() {
   if (miktexConfigured) return;
@@ -102,7 +102,7 @@ export async function compileLatex(fileRelativePath: string, engine: string = 'p
       maxBuffer: 10 * 1024 * 1024 
     });
 
-    // Overleaf-style second pass if references or table of contents need syncing
+    // Automatic second pass if references or table of contents need syncing
     if (stdout.includes('Rerun to get cross-references right') || stdout.includes('Rerun to get outlines right')) {
       try {
         const rerunResult = await execAsync(command, { 

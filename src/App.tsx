@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import FileTree from './components/sidebar/FileTree';
 import GitHistory from './components/history/GitHistory';
@@ -40,10 +40,38 @@ export default function App() {
   const [sidebarTab, setSidebarTab] = useState<'files' | 'history'>('files');
   const [treeRefreshTrigger, setTreeRefreshTrigger] = useState(0);
   const [navigationTarget, setNavigationTarget] = useState<NavigationTarget | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Sliding & collapsible panel states
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isPdfOpen, setIsPdfOpen] = useState(true);
+
+  // Automatically select main.tex or the first .tex file on initial load if none selected
+  useEffect(() => {
+    if (!activeFilePath) {
+      axios.get('/api/fs/tree')
+        .then(res => {
+          const findDefault = (nodes: any[]): string | null => {
+            for (const n of nodes) {
+              if (n.type === 'file' && (n.name === 'main.tex' || n.path === 'main.tex')) return n.path;
+            }
+            for (const n of nodes) {
+              if (n.type === 'file' && n.name.endsWith('.tex')) return n.path;
+              if (n.type === 'directory' && n.children) {
+                const sub = findDefault(n.children);
+                if (sub) return sub;
+              }
+            }
+            return null;
+          };
+          const defaultTex = findDefault(res.data);
+          if (defaultTex) {
+            setActiveFilePath(defaultTex);
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const isFocusMode = !isSidebarOpen && !isPdfOpen;
 
@@ -191,11 +219,17 @@ export default function App() {
         )}
 
         <div className="flex-1 min-w-0 h-full relative">
-          <PanelGroup direction="horizontal">
+          <PanelGroup id="main-panel-group" autoSaveId="omnitex-layout-v3" direction="horizontal">
             {/* Sidebar (File Tree or Git History) */}
             {isSidebarOpen && (
-              <>
-                <Panel defaultSize={20} minSize={14} maxSize={40}>
+              <Panel
+                id="panel-sidebar"
+                order={1}
+                defaultSize={20}
+                minSize={12}
+                maxSize={35}
+              >
+                <div className={cn("h-full w-full", isDragging && "pointer-events-none select-none")}>
                   {sidebarTab === 'files' ? (
                     <FileTree 
                       activePath={activeFilePath} 
@@ -206,29 +240,62 @@ export default function App() {
                   ) : (
                     <GitHistory onCollapse={() => setIsSidebarOpen(false)} />
                   )}
-                </Panel>
-                <PanelResizeHandle className="w-1 bg-zinc-200 hover:bg-green-500 transition-colors" />
-              </>
+                </div>
+              </Panel>
+            )}
+
+            {isSidebarOpen && (
+              <PanelResizeHandle
+                id="handle-sidebar-editor"
+                onDragging={setIsDragging}
+                className="relative flex items-center justify-center w-1.5 hover:w-1.5 group cursor-col-resize select-none bg-zinc-200 hover:bg-indigo-500 active:bg-indigo-600 transition-colors focus:outline-none data-[resize-handle-active]:bg-indigo-600 shrink-0"
+              >
+                <div className="absolute inset-y-0 -left-2 -right-2 z-30 pointer-events-auto" />
+                <div className="w-0.5 h-6 bg-zinc-400 group-hover:bg-white rounded-full transition-colors" />
+              </PanelResizeHandle>
             )}
 
             {/* Editor / Viewer (Concentrate on writing the TeX file) */}
-            <Panel minSize={25}>
-              {getEditorContent()}
+            <Panel
+              id="panel-editor"
+              order={2}
+              defaultSize={45}
+              minSize={25}
+            >
+              <div className={cn("h-full w-full", isDragging && "pointer-events-none select-none")}>
+                {getEditorContent()}
+              </div>
             </Panel>
 
             {/* PDF Preview Section */}
             {isPdfOpen && (
-              <>
-                <PanelResizeHandle className="w-1 bg-zinc-200 hover:bg-green-500 transition-colors" />
-                <Panel defaultSize={40} minSize={20} maxSize={70}>
+              <PanelResizeHandle
+                id="handle-editor-pdf"
+                onDragging={setIsDragging}
+                className="relative flex items-center justify-center w-1.5 hover:w-1.5 group cursor-col-resize select-none bg-zinc-200 hover:bg-indigo-500 active:bg-indigo-600 transition-colors focus:outline-none data-[resize-handle-active]:bg-indigo-600 shrink-0"
+              >
+                <div className="absolute inset-y-0 -left-2 -right-2 z-30 pointer-events-auto" />
+                <div className="w-0.5 h-6 bg-zinc-400 group-hover:bg-white rounded-full transition-colors" />
+              </PanelResizeHandle>
+            )}
+
+            {isPdfOpen && (
+              <Panel
+                id="panel-pdf"
+                order={3}
+                defaultSize={35}
+                minSize={20}
+                maxSize={65}
+              >
+                <div className={cn("h-full w-full", isDragging && "pointer-events-none select-none")}>
                   <PdfViewer 
                     activeFilePath={activeFilePath} 
                     onCompileSuccess={() => setTreeRefreshTrigger(prev => prev + 1)}
                     onNavigateToSource={handleNavigateToSource}
                     onCollapse={() => setIsPdfOpen(false)}
                   />
-                </Panel>
-              </>
+                </div>
+              </Panel>
             )}
           </PanelGroup>
         </div>

@@ -346,6 +346,7 @@ export default function PdfViewer({ activeFilePath, onCompileSuccess, onNavigate
         // Append timestamp to bypass browser cache
         const timestamp = new Date().getTime();
         setPdfUrl(`/api/compiler/pdf?path=${encodeURIComponent(pdfPath)}&t=${timestamp}`);
+        setError(null);
         setShowLogs(false);
         onCompileSuccess?.();
       } else {

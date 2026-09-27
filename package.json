@@ -2,7 +2,7 @@
   "name": "omnitex",
   "private": true,
   "version": "1.0.0",
-  "description": "OmniTex - A Git-backed local web IDE for LaTeX with Overleaf-style UI, Monaco editor, and real-time preview",
+  "description": "OmniTex - A Git-backed local web IDE for LaTeX with modern split-pane UI, Monaco editor, and real-time preview",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",

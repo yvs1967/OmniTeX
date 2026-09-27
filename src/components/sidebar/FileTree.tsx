@@ -196,6 +196,9 @@ export default function FileTree({ onFileSelect, activePath, refreshTrigger, onC
 
     try {
       await axios.post('/api/fs/rename', { oldPath, newPath });
+      if (activePath === oldPath) {
+        onFileSelect(newPath);
+      }
       await fetchTree();
     } catch (err: any) {
       setError(`Move failed: ${err.response?.data?.error || err.message}`);
